@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jadwal KRL Tangerang - Duri</title>
+    <style>
+        :root {
+            --primary-color: #DD0067;
+            --secondary-color: #0066CC;
+            --background-color: #f5f5f5;
+            --card-color: #ffffff;
+            --text-color: #333333;
+            --text-light: #666666;
+            --border-color: #e0e0e0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .station-selector {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .select-container {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 1rem;
+            background-color: var(--card-color);
+            color: var(--text-color);
+        }
+
+        .schedule-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .schedule-card {
+            background-color: var(--card-color);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+
+        .schedule-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .train-info {
+            flex: 2;
+        }
+
+        .train-time {
+            flex: 1;
+            text-align: right;
+        }
+
+        .train-number {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+
+        .train-route {
+            color: var(--text-light);
+            margin-top: 5px;
+        }
+
+        .train-line {
+            display: inline-block;
+            padding: 3px 8px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-top: 8px;
+        }
+
+        .departure-time {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .arrival-time {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-light);
+        }
+
+        .error {
+            text-align: center;
+            padding: 30px;
+            color: #d32f2f;
+            background-color: #ffebee;
+            border-radius: 8px;
+        }
+
+        .refresh-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        .refresh-btn:hover {
+            background-color: #c1005a;
+        }
+
+        @media (max-width: 768px) {
+            .station-selector {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .schedule-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .train-time {
+                text-align: left;
+                margin-top: 15px;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Jadwal KRL Commuter Line</h1>
+            <p class="subtitle">Stasiun Tangerang ke Duri - Realtime</p>
+        </header>
+
+        <div class="station-selector">
+            <div class="select-container">
+                <select id="originStation">
+                    <option value="TNG" selected>Tangerang (TNG)</option>
+                </select>
+            </div>
+            <div class="select-container">
+                <select id="destinationStation">
+                    <option value="DU" selected>Duri (DU)</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="scheduleContainer" class="schedule-container">
+            <div class="loading">Memuat jadwal...</div>
+        </div>
+
+        <button id="refreshBtn" class="refresh-btn">Perbarui Jadwal</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const originStation = document.getElementById('originStation');
+            const destinationStation = document.getElementById('destinationStation');
+            const scheduleContainer = document.getElementById('scheduleContainer');
+            const refreshBtn = document.getElementById('refreshBtn');
+
+            // Set default stations
+            originStation.value = 'TNG';
+            destinationStation.value = 'DU';
+
+            // Fetch schedule when page loads
+            fetchSchedule('TNG', 'DU');
+
+            // Refresh button click handler
+            refreshBtn.addEventListener('click', function() {
+                const origin = originStation.value;
+                const destination = destinationStation.value;
+                fetchSchedule(origin, destination);
+            });
+
+            // Function to fetch schedule data
+            async function fetchSchedule(origin, destination) {
+                scheduleContainer.innerHTML = '<div class="loading">Memuat jadwal...</div>';
+                
+                try {
+                    // First get all schedules for origin station
+                    const response = await fetch(`https://api.comuline.com/v1/schedule/${origin}`);
+                    
+                    if (!response.ok) {
+                        throw new Error('Gagal mengambil data jadwal');
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (!data.metadata.success || !data.data || data.data.length === 0) {
+                        scheduleContainer.innerHTML = '<div class="error">Tidak ada jadwal yang tersedia saat ini</div>';
+                        return;
+                    }
+                    
+                    // Filter schedules that go to the destination station
+                    const filteredSchedules = data.data.filter(schedule => {
+                        return schedule.station_destination_id === destination;
+                    });
+                    
+                    if (filteredSchedules.length === 0) {
+                        scheduleContainer.innerHTML = '<div class="error">Tidak ada jadwal langsung ke stasiun tujuan</div>';
+                        return;
+                    }
+                    
+                    // Display the schedules
+                    displaySchedules(filteredSchedules);
+                } catch (error) {
+                    console.error('Error:', error);
+                    scheduleContainer.innerHTML = `<div class="error">${error.message}</div>`;
+                }
+            }
+            
+            // Function to display schedules
+            function displaySchedules(schedules) {
+                if (schedules.length === 0) {
+                    scheduleContainer.innerHTML = '<div class="error">Tidak ada jadwal yang tersedia saat ini</div>';
+                    return;
+                }
+                
+                // Sort schedules by departure time
+                schedules.sort((a, b) => new Date(a.departs_at) - new Date(b.departs_at));
+                
+                let html = '';
+                
+                schedules.forEach(schedule => {
+                    const departsAt = new Date(schedule.departs_at);
+                    const arrivesAt = new Date(schedule.arrives_at);
+                    
+                    const departureTime = departsAt.toLocaleTimeString('id-ID', { 
+                        hour: '2-digit', 
+                        minute: '2-digit',
+                        timeZone: 'Asia/Jakarta'
+                    });
+                    
+                    const arrivalTime = arrivesAt.toLocaleTimeString('id-ID', { 
+                        hour: '2-digit', 
+                        minute: '2-digit',
+                        timeZone: 'Asia/Jakarta'
+                    });
+                    
+                    html += `
+                        <div class="schedule-card">
+                            <div class="train-info">
+                                <div class="train-number">${schedule.train_id}</div>
+                                <div class="train-route">${schedule.station_origin_id} → ${schedule.station_destination_id}</div>
+                                <div class="train-line">${schedule.line}</div>
+                            </div>
+                            <div class="train-time">
+                                <div class="departure-time">${departureTime}</div>
+                                <div class="arrival-time">Tiba: ${arrivalTime}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                scheduleContainer.innerHTML = html;
+            }
+        });
+    </script>
+</body>
+</html>

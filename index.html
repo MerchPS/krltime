@@ -3,118 +3,268 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KRL Tracker - Tangerang ke Duri</title>
+    <title>KRL Real-Time Tracker | Tangerang - Duri</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary-color: #DD0067;
             --secondary-color: #0066CC;
-            --background-color: #f5f5f5;
+            --background-color: #f8f9fa;
             --card-color: #ffffff;
-            --text-color: #333333;
-            --text-light: #666666;
-            --border-color: #e0e0e0;
-            --track-color: #e0e0e0;
+            --text-color: #2d3748;
+            --text-light: #718096;
+            --border-color: #e2e8f0;
+            --track-color: #e2e8f0;
             --progress-color: #DD0067;
+            --station-active: #4fd1c5;
+            --station-inactive: #cbd5e0;
+            --warning-color: #ed8936;
+            --error-color: #f56565;
+            --success-color: #48bb78;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        @font-face {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2) format('woff2');
+        }
+
+        @font-face {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 600;
+            src: url(https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuGKYAZ9hiA.woff2) format('woff2');
         }
 
         body {
             background-color: var(--background-color);
             color: var(--text-color);
             line-height: 1.6;
-            padding: 20px;
+            padding: 0;
+            min-height: 100vh;
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
+            padding: 20px;
         }
 
         header {
-            text-align: center;
-            margin-bottom: 30px;
+            background-color: var(--primary-color);
+            color: white;
             padding: 20px 0;
-            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         h1 {
-            color: var(--primary-color);
-            margin-bottom: 10px;
+            font-size: 1.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .subtitle {
-            color: var(--text-light);
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .current-time {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
             font-size: 1.1rem;
         }
 
         .control-panel {
             background-color: var(--card-color);
-            border-radius: 10px;
-            padding: 20px;
+            border-radius: 12px;
+            padding: 25px;
             margin-bottom: 30px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             display: flex;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 25px;
         }
 
         .control-group {
             flex: 1;
-            min-width: 200px;
+            min-width: 250px;
         }
 
         .control-label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-weight: 600;
-            color: var(--text-light);
+            color: var(--text-color);
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        select, input {
+        select {
             width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 5px;
+            padding: 14px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
             font-size: 1rem;
             background-color: var(--card-color);
             color: var(--text-color);
+            transition: all 0.2s;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 1em;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(221, 0, 103, 0.2);
+        }
+
+        .time-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 15px;
         }
 
         .time-slider {
-            width: 100%;
-            margin-top: 15px;
+            flex: 1;
+            -webkit-appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--track-color);
+            outline: none;
+        }
+
+        .time-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .time-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .time-display {
+            min-width: 80px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .time-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .route-container {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 30px;
+        }
+
+        .route-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .route-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .route-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background-color: var(--station-inactive);
+            color: var(--text-color);
+        }
+
+        .route-status.soon {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .route-status.departed {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .route-status.arrived {
+            background-color: var(--success-color);
+            color: white;
         }
 
         .route-visualization {
             background-color: var(--card-color);
-            border-radius: 10px;
-            padding: 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             position: relative;
             overflow: hidden;
         }
 
         .route-line {
-            height: 4px;
+            height: 8px;
             background-color: var(--track-color);
             position: relative;
-            margin: 40px 20px;
-            border-radius: 2px;
+            margin: 40px 20px 60px;
+            border-radius: 4px;
+            overflow: hidden;
         }
 
         .route-progress {
             height: 100%;
-            background-color: var(--progress-color);
+            background: linear-gradient(90deg, var(--primary-color), var(--progress-color));
             width: 0%;
-            border-radius: 2px;
+            border-radius: 4px;
             transition: width 0.5s ease;
         }
 
@@ -124,75 +274,139 @@
             left: 0%;
             transform: translate(-50%, -50%);
             color: var(--primary-color);
-            font-size: 24px;
+            font-size: 28px;
             transition: left 0.5s ease;
+            z-index: 10;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
         }
 
         .station-markers {
             display: flex;
             justify-content: space-between;
             position: relative;
-            margin-top: 20px;
+            margin-top: -20px;
         }
 
         .station-marker {
             position: relative;
             text-align: center;
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .station-dot-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            width: 100%;
         }
 
         .station-dot {
-            width: 12px;
-            height: 12px;
-            background-color: var(--track-color);
+            width: 16px;
+            height: 16px;
+            background-color: var(--station-inactive);
             border-radius: 50%;
-            margin: 0 auto 10px;
+            margin-bottom: 10px;
             position: relative;
             z-index: 2;
+            border: 3px solid var(--card-color);
+            transition: all 0.3s ease;
         }
 
         .station-dot.active {
-            background-color: var(--progress-color);
+            background-color: var(--station-active);
+            transform: scale(1.2);
+        }
+
+        .station-dot.current {
+            background-color: var(--primary-color);
             transform: scale(1.3);
+            box-shadow: 0 0 0 3px rgba(221, 0, 103, 0.3);
         }
 
         .station-name {
             font-size: 0.8rem;
             color: var(--text-light);
-            white-space: nowrap;
-            transform: rotate(45deg);
-            transform-origin: top left;
             position: absolute;
+            top: 30px;
+            text-align: center;
+            width: 100px;
             left: 50%;
-            bottom: -25px;
+            transform: translateX(-50%);
+            font-weight: 500;
+        }
+
+        .station-time {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-top: 25px;
+            font-weight: 500;
         }
 
         .schedule-container {
             display: grid;
             grid-template-columns: 1fr;
             gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .schedule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .schedule-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .refresh-btn {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .refresh-btn:hover {
+            background-color: #c1005a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         .schedule-card {
             background-color: var(--card-color);
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 20px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
             display: flex;
             justify-content: space-between;
             align-items: center;
             transition: all 0.3s;
             cursor: pointer;
-            border-left: 4px solid transparent;
+            border-left: 5px solid transparent;
         }
 
         .schedule-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
         }
 
         .schedule-card.selected {
-            border-left: 4px solid var(--primary-color);
+            border-left: 5px solid var(--primary-color);
             background-color: rgba(221, 0, 103, 0.05);
         }
 
@@ -206,29 +420,34 @@
         }
 
         .train-number {
-            font-weight: bold;
+            font-weight: 600;
             font-size: 1.2rem;
             color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .train-route {
             color: var(--text-light);
             margin-top: 5px;
+            font-size: 0.95rem;
         }
 
         .train-line {
             display: inline-block;
-            padding: 3px 8px;
+            padding: 4px 10px;
             background-color: var(--primary-color);
             color: white;
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 0.8rem;
             margin-top: 8px;
+            font-weight: 500;
         }
 
         .departure-time {
             font-size: 1.3rem;
-            font-weight: bold;
+            font-weight: 600;
         }
 
         .arrival-time {
@@ -239,128 +458,172 @@
 
         .loading {
             text-align: center;
-            padding: 30px;
+            padding: 40px;
             color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .loading-spinner {
+            border: 3px solid rgba(221, 0, 103, 0.2);
+            border-radius: 50%;
+            border-top: 3px solid var(--primary-color);
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
         }
 
         .error {
             text-align: center;
             padding: 30px;
-            color: #d32f2f;
-            background-color: #ffebee;
-            border-radius: 8px;
+            color: var(--error-color);
+            background-color: rgba(245, 101, 101, 0.1);
+            border-radius: 10px;
+            font-weight: 500;
         }
 
-        .refresh-btn {
-            display: block;
-            margin: 20px auto;
-            padding: 12px 24px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .refresh-btn:hover {
-            background-color: #c1005a;
-            transform: translateY(-2px);
-        }
-
-        .current-time {
+        .no-schedule {
             text-align: center;
-            margin-top: 20px;
-            font-size: 1.2rem;
+            padding: 30px;
             color: var(--text-light);
+            font-size: 1.1rem;
         }
 
-        .time-info {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
+        footer {
+            text-align: center;
+            padding: 20px;
             color: var(--text-light);
             font-size: 0.9rem;
+            margin-top: 40px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
             .control-panel {
                 flex-direction: column;
-                gap: 15px;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .route-visualization {
+                padding: 20px;
+            }
+            
+            .route-line {
+                margin: 30px 10px 50px;
+            }
+            
+            .station-name {
+                width: 80px;
+                font-size: 0.7rem;
             }
             
             .schedule-card {
                 flex-direction: column;
                 align-items: flex-start;
+                gap: 15px;
             }
             
             .train-time {
                 text-align: left;
-                margin-top: 15px;
                 width: 100%;
+                display: flex;
+                justify-content: space-between;
             }
+        }
 
-            .station-name {
-                transform: none;
-                position: static;
-                margin-top: 5px;
-            }
+        /* Animation for pulse effect */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1><i class="fas fa-train"></i> KRL Tracker</h1>
-            <p class="subtitle">Pantau perjalanan KRL dari Tangerang ke Duri secara realtime</p>
-        </header>
+    <header>
+        <div class="header-content">
+            <div>
+                <h1><i class="fas fa-train"></i> KRL Real-Time Tracker</h1>
+                <p class="subtitle">Pantau pergerakan KRL dari Tangerang ke Duri secara real-time</p>
+            </div>
+            <div class="current-time" id="currentTimeHeader">00:00:00</div>
+        </div>
+    </header>
 
+    <div class="container">
         <div class="control-panel">
             <div class="control-group">
-                <label class="control-label" for="originStation"><i class="fas fa-map-marker-alt"></i> Stasiun Asal</label>
+                <label class="control-label"><i class="fas fa-map-marker-alt"></i> Stasiun Asal</label>
                 <select id="originStation">
                     <option value="TNG" selected>Tangerang (TNG)</option>
                 </select>
             </div>
             <div class="control-group">
-                <label class="control-label" for="destinationStation"><i class="fas fa-flag-checkered"></i> Stasiun Tujuan</label>
+                <label class="control-label"><i class="fas fa-flag-checkered"></i> Stasiun Tujuan</label>
                 <select id="destinationStation">
                     <option value="DU" selected>Duri (DU)</option>
                 </select>
             </div>
-            <div class="control-group">
-                <label class="control-label" for="timeSlider"><i class="far fa-clock"></i> Waktu Perjalanan</label>
-                <input type="range" id="timeSlider" class="time-slider" min="0" max="100" value="0">
-                <div class="time-info">
-                    <span id="currentTime">00:00</span>
-                    <span id="duration">00:00</span>
+        </div>
+
+        <div class="route-container">
+            <div class="route-header">
+                <h2 class="route-title">Rute Perjalanan</h2>
+                <div class="route-status" id="routeStatus">-</div>
+            </div>
+            <div class="route-visualization">
+                <div class="route-line">
+                    <div class="route-progress" id="routeProgress"></div>
+                    <div class="train-marker" id="trainMarker"><i class="fas fa-train"></i></div>
+                </div>
+                <div class="station-markers" id="stationMarkers">
+                    <!-- Stations will be added here dynamically -->
                 </div>
             </div>
         </div>
 
-        <div class="route-visualization">
-            <div class="route-line">
-                <div class="route-progress" id="routeProgress"></div>
-                <div class="train-marker" id="trainMarker"><i class="fas fa-train"></i></div>
-            </div>
-            <div class="station-markers" id="stationMarkers">
-                <!-- Stations will be added here dynamically -->
-            </div>
+        <div class="time-controls">
+            <input type="range" id="timeSlider" class="time-slider" min="0" max="100" value="0" step="0.1">
+            <div class="time-display" id="currentTimeDisplay">00:00</div>
+        </div>
+        <div class="time-info">
+            <span id="departureTime">-</span>
+            <span id="arrivalTime">-</span>
         </div>
 
-        <div id="scheduleContainer" class="schedule-container">
-            <div class="loading">Memuat jadwal...</div>
+        <div class="schedule-container" id="scheduleContainer">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                Memuat jadwal perjalanan...
+            </div>
         </div>
 
         <button id="refreshBtn" class="refresh-btn"><i class="fas fa-sync-alt"></i> Perbarui Jadwal</button>
     </div>
 
+    <footer>
+        Data diperbarui secara real-time dari API Comuline &copy; 2023
+    </footer>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
             const originStation = document.getElementById('originStation');
             const destinationStation = document.getElementById('destinationStation');
             const scheduleContainer = document.getElementById('scheduleContainer');
@@ -369,66 +632,93 @@
             const routeProgress = document.getElementById('routeProgress');
             const trainMarker = document.getElementById('trainMarker');
             const stationMarkers = document.getElementById('stationMarkers');
-            const currentTimeDisplay = document.getElementById('currentTime');
-            const durationDisplay = document.getElementById('duration');
+            const currentTimeDisplay = document.getElementById('currentTimeDisplay');
+            const departureTimeDisplay = document.getElementById('departureTime');
+            const arrivalTimeDisplay = document.getElementById('arrivalTime');
+            const routeStatus = document.getElementById('routeStatus');
+            const currentTimeHeader = document.getElementById('currentTimeHeader');
 
-            // Route information (simplified)
-            const routeStations = [
-                { id: 'TNG', name: 'Tangerang' },
-                { id: 'BPR', name: 'Batu Ceper' },
-                { id: 'BOI', name: 'Bojong Indah' },
-                { id: 'PSG', name: 'Pesing' },
-                { id: 'GGL', name: 'Grogol' },
-                { id: 'DU', name: 'Duri' }
-            ];
+            // Route configuration for Tangerang to Duri
+            const routeConfig = {
+                id: 'TNG-DU',
+                name: 'Tangerang - Duri',
+                stations: [
+                    { id: 'TNG', name: 'Tangerang', time: 0 },
+                    { id: 'BPR', name: 'Batu Ceper', time: 3 },
+                    { id: 'BOI', name: 'Bojong Indah', time: 7 },
+                    { id: 'PSG', name: 'Pesing', time: 10 },
+                    { id: 'GGL', name: 'Grogol', time: 14 },
+                    { id: 'DU', name: 'Duri', time: 18 }
+                ],
+                color: '#DD0067'
+            };
 
-            // Initialize station markers
-            function initStationMarkers() {
+            // State management
+            let state = {
+                schedules: [],
+                currentSchedule: null,
+                animationInterval: null,
+                currentTime: new Date(),
+                lastUpdated: null
+            };
+
+            // Initialize the app
+            function init() {
+                updateCurrentTime();
+                setInterval(updateCurrentTime, 1000);
+                loadStations();
+                fetchSchedule('TNG', 'DU');
+                
+                // Event listeners
+                refreshBtn.addEventListener('click', () => {
+                    const origin = originStation.value;
+                    const destination = destinationStation.value;
+                    fetchSchedule(origin, destination);
+                });
+
+                timeSlider.addEventListener('input', function() {
+                    if (state.currentSchedule) {
+                        updateTrainPosition(parseFloat(this.value));
+                    }
+                });
+            }
+
+            // Update current time display
+            function updateCurrentTime() {
+                state.currentTime = new Date();
+                const timeString = state.currentTime.toLocaleTimeString('id-ID', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+                currentTimeHeader.textContent = timeString;
+            }
+
+            // Load station markers
+            function loadStations() {
                 stationMarkers.innerHTML = '';
-                routeStations.forEach((station, index) => {
+                
+                routeConfig.stations.forEach((station, index) => {
                     const marker = document.createElement('div');
                     marker.className = 'station-marker';
                     marker.innerHTML = `
-                        <div class="station-dot ${index === 0 ? 'active' : ''}" data-station="${station.id}"></div>
-                        <div class="station-name">${station.name}</div>
+                        <div class="station-dot-container">
+                            <div class="station-dot" data-station="${station.id}"></div>
+                            <div class="station-name">${station.name}</div>
+                            <div class="station-time" id="time-${station.id}">-</div>
+                        </div>
                     `;
                     stationMarkers.appendChild(marker);
                 });
             }
 
-            // Set default stations
-            originStation.value = 'TNG';
-            destinationStation.value = 'DU';
-            initStationMarkers();
-
-            // Current selected schedule
-            let currentSchedule = null;
-            let schedulesData = [];
-            let animationInterval = null;
-
-            // Fetch schedule when page loads
-            fetchSchedule('TNG', 'DU');
-
-            // Refresh button click handler
-            refreshBtn.addEventListener('click', function() {
-                const origin = originStation.value;
-                const destination = destinationStation.value;
-                fetchSchedule(origin, destination);
-            });
-
-            // Time slider change handler
-            timeSlider.addEventListener('input', function() {
-                if (currentSchedule) {
-                    updateTrainPosition(parseInt(this.value));
-                }
-            });
-
-            // Function to fetch schedule data
+            // Fetch schedule data
             async function fetchSchedule(origin, destination) {
-                scheduleContainer.innerHTML = '<div class="loading">Memuat jadwal...</div>';
+                showLoading();
+                state.schedules = [];
+                state.currentSchedule = null;
                 
                 try {
-                    // First get all schedules for origin station
                     const response = await fetch(`https://api.comuline.com/v1/schedule/${origin}`);
                     
                     if (!response.ok) {
@@ -438,69 +728,64 @@
                     const data = await response.json();
                     
                     if (!data.metadata.success || !data.data || data.data.length === 0) {
-                        scheduleContainer.innerHTML = '<div class="error">Tidak ada jadwal yang tersedia saat ini</div>';
+                        showError('Tidak ada jadwal yang tersedia saat ini');
                         return;
                     }
                     
-                    // Filter schedules that go to the destination station
-                    schedulesData = data.data.filter(schedule => {
-                        return schedule.station_destination_id === destination;
-                    });
+                    // Filter and process schedules
+                    state.schedules = data.data
+                        .filter(schedule => schedule.station_destination_id === destination)
+                        .map(schedule => ({
+                            ...schedule,
+                            departs_at: new Date(schedule.departs_at),
+                            arrives_at: new Date(schedule.arrives_at)
+                        }))
+                        .sort((a, b) => a.departs_at - b.departs_at);
                     
-                    if (schedulesData.length === 0) {
-                        scheduleContainer.innerHTML = '<div class="error">Tidak ada jadwal langsung ke stasiun tujuan</div>';
+                    if (state.schedules.length === 0) {
+                        showNoSchedule();
                         return;
                     }
                     
-                    // Display the schedules
-                    displaySchedules(schedulesData);
-                    
-                    // Select the first schedule by default
-                    if (schedulesData.length > 0) {
-                        selectSchedule(schedulesData[0]);
-                    }
+                    displaySchedules();
+                    selectSchedule(state.schedules[0]);
+                    state.lastUpdated = new Date();
                 } catch (error) {
                     console.error('Error:', error);
-                    scheduleContainer.innerHTML = `<div class="error">${error.message}</div>`;
+                    showError(error.message || 'Gagal memuat jadwal');
                 }
             }
-            
-            // Function to display schedules
-            function displaySchedules(schedules) {
-                if (schedules.length === 0) {
-                    scheduleContainer.innerHTML = '<div class="error">Tidak ada jadwal yang tersedia saat ini</div>';
+
+            // Display schedules
+            function displaySchedules() {
+                if (state.schedules.length === 0) {
+                    showNoSchedule();
                     return;
                 }
                 
-                // Sort schedules by departure time
-                schedules.sort((a, b) => new Date(a.departs_at) - new Date(b.departs_at));
-                
                 let html = '';
                 
-                schedules.forEach(schedule => {
-                    const departsAt = new Date(schedule.departs_at);
-                    const arrivesAt = new Date(schedule.arrives_at);
-                    
-                    const departureTime = departsAt.toLocaleTimeString('id-ID', { 
+                state.schedules.forEach(schedule => {
+                    const departureTime = schedule.departs_at.toLocaleTimeString('id-ID', { 
                         hour: '2-digit', 
-                        minute: '2-digit',
-                        timeZone: 'Asia/Jakarta'
+                        minute: '2-digit'
                     });
                     
-                    const arrivalTime = arrivesAt.toLocaleTimeString('id-ID', { 
+                    const arrivalTime = schedule.arrives_at.toLocaleTimeString('id-ID', { 
                         hour: '2-digit', 
-                        minute: '2-digit',
-                        timeZone: 'Asia/Jakarta'
+                        minute: '2-digit'
                     });
                     
-                    // Calculate duration in minutes
-                    const durationMs = arrivesAt - departsAt;
-                    const durationMinutes = Math.floor(durationMs / (1000 * 60));
+                    const durationMinutes = Math.floor((schedule.arrives_at - schedule.departs_at) / (1000 * 60));
+                    
+                    const isSelected = state.currentSchedule && state.currentSchedule.id === schedule.id;
                     
                     html += `
-                        <div class="schedule-card ${schedule === currentSchedule ? 'selected' : ''}" data-id="${schedule.id}">
+                        <div class="schedule-card ${isSelected ? 'selected' : ''}" data-id="${schedule.id}">
                             <div class="train-info">
-                                <div class="train-number">${schedule.train_id}</div>
+                                <div class="train-number">
+                                    <i class="fas fa-train"></i> ${schedule.train_id}
+                                </div>
                                 <div class="train-route">${schedule.station_origin_id} → ${schedule.station_destination_id}</div>
                                 <div class="train-line">${schedule.line}</div>
                             </div>
@@ -514,28 +799,28 @@
                 
                 scheduleContainer.innerHTML = html;
                 
-                // Add click handlers to schedule cards
+                // Add click handlers
                 document.querySelectorAll('.schedule-card').forEach(card => {
                     card.addEventListener('click', function() {
                         const scheduleId = this.getAttribute('data-id');
-                        const selectedSchedule = schedules.find(s => s.id === scheduleId);
+                        const selectedSchedule = state.schedules.find(s => s.id === scheduleId);
                         if (selectedSchedule) {
                             selectSchedule(selectedSchedule);
                         }
                     });
                 });
             }
-            
-            // Function to select a schedule
+
+            // Select a schedule
             function selectSchedule(schedule) {
-                // Clear any existing animation
-                if (animationInterval) {
-                    clearInterval(animationInterval);
-                    animationInterval = null;
+                // Clear previous animation
+                if (state.animationInterval) {
+                    clearInterval(state.animationInterval);
+                    state.animationInterval = null;
                 }
                 
-                // Update current schedule
-                currentSchedule = schedule;
+                // Update state
+                state.currentSchedule = schedule;
                 
                 // Update UI
                 document.querySelectorAll('.schedule-card').forEach(card => {
@@ -545,109 +830,189 @@
                     }
                 });
                 
-                // Parse times
-                const departsAt = new Date(schedule.departs_at);
-                const arrivesAt = new Date(schedule.arrives_at);
+                // Calculate station times based on schedule
+                calculateStationTimes(schedule);
                 
-                // Update time display
-                const departureTime = departsAt.toLocaleTimeString('id-ID', { 
-                    hour: '2-digit', 
-                    minute: '2-digit',
-                    timeZone: 'Asia/Jakarta'
-                });
+                // Update time displays
+                departureTimeDisplay.textContent = `Berangkat: ${schedule.departs_at.toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'})}`;
+                arrivalTimeDisplay.textContent = `Tiba: ${schedule.arrives_at.toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'})}`;
                 
-                const arrivalTime = arrivesAt.toLocaleTimeString('id-ID', { 
-                    hour: '2-digit', 
-                    minute: '2-digit',
-                    timeZone: 'Asia/Jakarta'
-                });
-                
-                currentTimeDisplay.textContent = departureTime;
-                durationDisplay.textContent = arrivalTime;
-                
-                // Calculate duration in minutes for animation
-                const durationMs = arrivesAt - departsAt;
-                const durationMinutes = durationMs / (1000 * 60);
-                
-                // Reset slider
+                // Reset slider and progress
                 timeSlider.value = 0;
                 updateTrainPosition(0);
                 
-                // Start animation if the schedule is in the future
+                // Determine schedule status and animate accordingly
                 const now = new Date();
-                if (departsAt > now) {
-                    // Schedule hasn't departed yet
-                    updateCurrentTime(now, departsAt);
-                } else if (arrivesAt > now) {
+                if (now < schedule.departs_at) {
+                    // Schedule is in the future
+                    routeStatus.textContent = "Akan Berangkat";
+                    routeStatus.className = "route-status soon";
+                    
+                    // Calculate time until departure
+                    const timeUntilDeparture = schedule.departs_at - now;
+                    const hours = Math.floor(timeUntilDeparture / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeUntilDeparture % (1000 * 60 * 60)) / (1000 * 60));
+                    
+                    // Start animation when time comes
+                    setTimeout(() => {
+                        animateTrain(0, 100, schedule.arrives_at - schedule.departs_at);
+                    }, timeUntilDeparture);
+                    
+                } else if (now < schedule.arrives_at) {
                     // Train is en route
-                    const progress = ((now - departsAt) / durationMs) * 100;
+                    routeStatus.textContent = "Dalam Perjalanan";
+                    routeStatus.className = "route-status departed";
+                    
+                    const progress = ((now - schedule.departs_at) / (schedule.arrives_at - schedule.departs_at)) * 100;
                     timeSlider.value = Math.min(100, Math.max(0, progress));
                     updateTrainPosition(progress);
-                    animateTrain(progress, 100, durationMs - (now - departsAt));
+                    
+                    // Continue animation
+                    animateTrain(progress, 100, schedule.arrives_at - now);
                 } else {
                     // Trip completed
+                    routeStatus.textContent = "Sudah Tiba";
+                    routeStatus.className = "route-status arrived";
                     timeSlider.value = 100;
                     updateTrainPosition(100);
                 }
             }
-            
-            // Function to update train position
+
+            // Calculate estimated times for each station
+            function calculateStationTimes(schedule) {
+                const totalDuration = schedule.arrives_at - schedule.departs_at;
+                const totalRouteTime = routeConfig.stations[routeConfig.stations.length - 1].time;
+                
+                routeConfig.stations.forEach(station => {
+                    const stationTime = new Date(
+                        schedule.departs_at.getTime() + 
+                        (totalDuration * (station.time / totalRouteTime))
+                    );
+                    
+                    const timeElement = document.getElementById(`time-${station.id}`);
+                    if (timeElement) {
+                        timeElement.textContent = stationTime.toLocaleTimeString('id-ID', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                    }
+                });
+            }
+
+            // Update train position on the route
             function updateTrainPosition(percentage) {
                 percentage = Math.min(100, Math.max(0, percentage));
+                
+                // Update progress bar
                 routeProgress.style.width = `${percentage}%`;
+                
+                // Update train marker position
                 trainMarker.style.left = `${percentage}%`;
                 
-                // Update station dots
-                const activeStationIndex = Math.floor((percentage / 100) * (routeStations.length - 1));
-                document.querySelectorAll('.station-dot').forEach((dot, index) => {
-                    dot.classList.toggle('active', index <= activeStationIndex);
-                });
-                
                 // Update current time display
-                if (currentSchedule) {
-                    const departsAt = new Date(currentSchedule.departs_at);
-                    const arrivesAt = new Date(currentSchedule.arrives_at);
-                    const durationMs = arrivesAt - departsAt;
-                    const currentTime = new Date(departsAt.getTime() + (durationMs * (percentage / 100)));
+                if (state.currentSchedule) {
+                    const currentTime = new Date(
+                        state.currentSchedule.departs_at.getTime() + 
+                        ((state.currentSchedule.arrives_at - state.currentSchedule.departs_at) * (percentage / 100))
+                    );
                     
-                    currentTimeDisplay.textContent = currentTime.toLocaleTimeString('id-ID', { 
-                        hour: '2-digit', 
-                        minute: '2-digit',
-                        timeZone: 'Asia/Jakarta'
+                    currentTimeDisplay.textContent = currentTime.toLocaleTimeString('id-ID', {
+                        hour: '2-digit',
+                        minute: '2-digit'
                     });
                 }
+                
+                // Update station markers
+                const activeStationIndex = Math.floor(
+                    (percentage / 100) * (routeConfig.stations.length - 1)
+                );
+                
+                document.querySelectorAll('.station-dot').forEach((dot, index) => {
+                    dot.classList.remove('active', 'current');
+                    
+                    if (index < activeStationIndex) {
+                        dot.classList.add('active');
+                    } else if (index === activeStationIndex) {
+                        dot.classList.add('current');
+                        
+                        // Add pulse animation to current station
+                        if (percentage > 0 && percentage < 100) {
+                            dot.classList.add('pulse');
+                        } else {
+                            dot.classList.remove('pulse');
+                        }
+                    }
+                });
             }
-            
-            // Function to animate train progress
+
+            // Animate train movement
             function animateTrain(startPercentage, endPercentage, durationMs) {
                 const startTime = Date.now();
                 const endTime = startTime + durationMs;
                 
-                animationInterval = setInterval(() => {
+                // Clear any existing animation
+                if (state.animationInterval) {
+                    clearInterval(state.animationInterval);
+                }
+                
+                // Update immediately
+                const initialProgress = calculateProgress(startTime, endTime, startPercentage, endPercentage);
+                updateTrainPosition(initialProgress);
+                timeSlider.value = initialProgress;
+                
+                // Set up animation interval
+                state.animationInterval = setInterval(() => {
                     const now = Date.now();
                     if (now >= endTime) {
-                        clearInterval(animationInterval);
+                        clearInterval(state.animationInterval);
                         updateTrainPosition(endPercentage);
+                        timeSlider.value = endPercentage;
+                        routeStatus.textContent = "Sudah Tiba";
+                        routeStatus.className = "route-status arrived";
                         return;
                     }
                     
-                    const elapsed = now - startTime;
-                    const progress = startPercentage + ((endPercentage - startPercentage) * (elapsed / durationMs));
+                    const progress = calculateProgress(now, endTime, startPercentage, endPercentage);
                     updateTrainPosition(progress);
                     timeSlider.value = progress;
                 }, 1000);
             }
-            
-            // Function to update current time display
-            function updateCurrentTime(now, departsAt) {
-                const timeUntilDeparture = departsAt - now;
-                if (timeUntilDeparture <= 0) return;
-                
-                const hours = Math.floor(timeUntilDeparture / (1000 * 60 * 60));
-                const minutes = Math.floor((timeUntilDeparture % (1000 * 60 * 60)) / (1000 * 60));
-                
-                currentTimeDisplay.textContent = `Berangkat dalam ${hours > 0 ? hours + ' jam ' : ''}${minutes} menit`;
+
+            // Calculate animation progress
+            function calculateProgress(now, endTime, startPercentage, endPercentage) {
+                const elapsed = now - (endTime - (endPercentage - startPercentage) * 100);
+                const totalDuration = (endPercentage - startPercentage) * 100;
+                return startPercentage + ((endPercentage - startPercentage) * (elapsed / totalDuration));
             }
+
+            // UI Helper functions
+            function showLoading() {
+                scheduleContainer.innerHTML = `
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        Memuat jadwal perjalanan...
+                    </div>
+                `;
+            }
+
+            function showError(message) {
+                scheduleContainer.innerHTML = `
+                    <div class="error">
+                        <i class="fas fa-exclamation-circle"></i> ${message}
+                    </div>
+                `;
+            }
+
+            function showNoSchedule() {
+                scheduleContainer.innerHTML = `
+                    <div class="no-schedule">
+                        <i class="fas fa-train"></i> Tidak ada jadwal yang tersedia
+                    </div>
+                `;
+            }
+
+            // Initialize the application
+            init();
         });
     </script>
 </body>
